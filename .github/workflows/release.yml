@@ -1,0 +1,29 @@
+name: Publish `rails-compose` gem on RubyGems
+
+on:  
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: glials/rails-compose/.github/workflows/build.yml
+
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
+      - name: Configure RubyGems to use API KEY
+        run: |
+          mkdir -p $HOME/.gem
+          touch $HOME/.gem/credentials
+          chmod 0600 $HOME/.gem/credentials
+          printf -- "---\n:rubygems_api_key: ${RUBYGEMS_API_KEY}\n" > $HOME/.gem/credentials
+          gem build *.gemspec
+          gem push *.gem
+
+      - name: Publish gem
+        run: gem push "rails-compose-${{ env.RELEASE_VERSION }}.gem"

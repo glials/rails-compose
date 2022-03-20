@@ -1,21 +1,17 @@
-name: Ruby
+name: Build `rails-compose` gem
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@359bebbc29cbe6c87da6bc9ea3bc930432750108
-        with:
-          ruby-version: '3.1'
+
+      - uses: glials/rails-compose/.github/workflows/test.yml
+
       - name: Build gem
-        run: gem build
-      - name: Push gem
-        run: gem push
+        run: gem build rails-compose.gemspec
